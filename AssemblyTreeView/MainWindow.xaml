@@ -5,19 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AssemblyTreeView"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Window.Resources>
-        <Style TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14" />
-        </Style>
-        <Style TargetType="TextBox">
-            <Setter Property="FontSize" Value="14" />
-        </Style>
-        <Style TargetType="Button">
-            <Setter Property="Width" Value="40" />
-            <Setter Property="Margin" Value="5" />
-        </Style>
-    </Window.Resources>
+        Title="MainWindow" Height="720" Width="1280">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -28,7 +16,7 @@
             <RowDefinition Height="0.2*" />
         </Grid.RowDefinitions>
 
-        <TreeView Grid.Row="0" x:Name="treeView" Margin="0,0,0,72" Grid.RowSpan="2" Grid.ColumnSpan="2">
+        <TreeView Grid.Row="0" x:Name="treeView" FontSize="20" Margin="0,0,0,72" Grid.RowSpan="2" Grid.ColumnSpan="2">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Nodes}">
                     <TextBlock Text="{Binding Data}" />
@@ -36,7 +24,7 @@
             </TreeView.ItemTemplate>
         </TreeView>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,45,0,0">
             <Button Command="{Binding OpenDllCommand}" Width="81">Open DLL</Button>
         </StackPanel>
 

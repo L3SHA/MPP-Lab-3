@@ -47,11 +47,16 @@ namespace AssemblyBrowser
 
         private void SetTypes(List<TypeData> types, Type type)
         {
-            TypeData typeData = new TypeData(type.FullName);
+            TypeData typeData = GetTypeData(types, type);
+
+            if (typeData == null)
+            {
+                typeData = new TypeData(type.Name);
+            }
 
             var methods = typeData.Methods;
 
-            SetMethods(methods, type);
+            SetMethods(types, methods, type);
 
             var fields = typeData.Fields;
 
@@ -64,7 +69,21 @@ namespace AssemblyBrowser
             types.Add(typeData);
         }
 
-        private void SetMethods(List<MethodData> methods, Type type)
+        private TypeData GetTypeData(List<TypeData> types, Type type)
+        {
+            TypeData data = null;
+            foreach (TypeData typeData in types)
+            {
+                if (typeData.Name == type.Name)
+                {
+                    data = typeData;
+                    break;
+                }
+            }
+            return data;
+        }
+
+        private void SetMethods(List<TypeData> types, List<MethodData> methods, Type type)
         {
             foreach (MethodInfo methodInfo in type.GetMethods(bindingFlags))
             {
@@ -81,7 +100,26 @@ namespace AssemblyBrowser
                     accessModifier = "Non-public";
                 }
 
-                methods.Add(new MethodData(accessModifier, methodInfo.Name, parameters, methodInfo.ReturnType.ToString()));
+                if (methodInfo.IsDefined(typeof(ExtensionAttribute), true))
+                {
+                    var typeData = GetTypeData(types, methodInfo.GetParameters()[0].ParameterType);
+
+                    if (typeData != null)
+                    {
+                        typeData.Methods.Add(new MethodData(accessModifier, methodInfo.Name, parameters, methodInfo.ReturnType.Name));
+                    }
+                    else
+                    {
+                        TypeData newTypeData = new TypeData(type.Name);
+                        newTypeData.Methods.Add(new MethodData(accessModifier, methodInfo.Name, parameters, methodInfo.ReturnType.Name));
+                        types.Add(newTypeData);
+                    }
+                }
+                else
+                {
+                    methods.Add(new MethodData(accessModifier, methodInfo.Name, parameters, methodInfo.ReturnType.Name));
+                }
+
             }
         }
 
@@ -91,7 +129,7 @@ namespace AssemblyBrowser
 
             foreach (ParameterInfo parameterInfo in methodInfo.GetParameters())
             {
-                parameters.Add(parameterInfo.Name, parameterInfo.ParameterType.ToString());
+                parameters.Add(parameterInfo.Name, parameterInfo.ParameterType.Name);
             }
 
             return parameters;
@@ -114,7 +152,7 @@ namespace AssemblyBrowser
                         accessModifier = "Non-public";
                     }
 
-                    fields.Add(new FieldData(accessModifier, fieldInfo.Name, fieldInfo.FieldType.ToString()));
+                    fields.Add(new FieldData(accessModifier, fieldInfo.Name, fieldInfo.FieldType.Name));
                 }
             }
         }
@@ -123,7 +161,7 @@ namespace AssemblyBrowser
         {
             foreach (PropertyInfo propertyInfo in type.GetProperties(bindingFlags))
             {
-                properties.Add(new PropertyData(propertyInfo.Name, propertyInfo.PropertyType.ToString()));
+                properties.Add(new PropertyData(propertyInfo.Name, propertyInfo.PropertyType.Name));
             }
         }
 

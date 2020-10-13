@@ -22,7 +22,24 @@ namespace AssemblyBrowser
 
         public override string ToString()
         {
-            return Name + " " + ReturnValue;
+            string paramsString = "";
+
+            foreach (string name in Parameters.Keys)
+            {
+                string type;
+                Parameters.TryGetValue(name, out type);
+                paramsString += type + " " + name + ", "; 
+            }
+
+            if (paramsString.Length != 0) 
+            {
+                paramsString = paramsString.Remove(paramsString.Length - 2, 2); 
+            }
+            else
+            {
+                paramsString = " ";
+            }
+            return ReturnValue + " " + Name + "(" + paramsString + ")";
         }
     }
 }

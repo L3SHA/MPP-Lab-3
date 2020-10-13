@@ -32,6 +32,7 @@ namespace AssemblyTreeView
         private void SetTreeData()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "dll files(*.dll) |*.dll| All files(*.*) |*.*";
             if (openFileDialog.ShowDialog() == true)
             {
                 string path = openFileDialog.FileName;
@@ -40,40 +41,59 @@ namespace AssemblyTreeView
 
                 Nodes = new ObservableCollection<Node>();
 
+                Node node = new Node();
+                node.Data = "Namespaces";
+
+                Nodes.Add(node);
+
                 foreach (string name in data.NameSpaces.Keys)
                 {
+
                     Node nameSpaceNode = new Node();
                     nameSpaceNode.Data = name;
+                    Node nameSpaceNodeData = new Node();
+                    nameSpaceNode.Nodes.Add(nameSpaceNodeData);
+                    nameSpaceNodeData.Data = "Classes";
                     NameSpaceData nameSpaceData;
                     data.NameSpaces.TryGetValue(name, out nameSpaceData);
+
                     foreach (TypeData typeData in nameSpaceData.TypesList)
                     {
                         var typeNode = new Node();
+                        var methodNode = new Node();
+                        methodNode.Data = "Methods";
+                        var fieldNode = new Node();
+                        fieldNode.Data = "Fields";
+                        var propertyNode = new Node();
+                        propertyNode.Data = "Properties";
+                        typeNode.Nodes.Add(methodNode);
+                        typeNode.Nodes.Add(fieldNode);
+                        typeNode.Nodes.Add(propertyNode);
                         typeNode.Data = typeData.Name;
                         var methods = typeData.Methods;
                         foreach (MethodData methodData in methods)
                         {
-                            var methodNode = new Node();
-                            methodNode.Data = methodData.ToString();
-                            typeNode.Nodes.Add(methodNode);
+                            var methodNodeData = new Node();
+                            methodNodeData.Data = methodData.ToString();
+                            typeNode.Nodes[0].Nodes.Add(methodNodeData);
                         }
                         var fields = typeData.Fields;
                         foreach (FieldData fieldData in fields)
                         {
-                            var fieldNode = new Node();
-                            fieldNode.Data = fieldData.ToString();
-                            typeNode.Nodes.Add(fieldNode);
+                            var fieldNodeData = new Node();
+                            fieldNodeData.Data = fieldData.ToString();
+                            typeNode.Nodes[1].Nodes.Add(fieldNodeData);
                         }
                         var properties = typeData.Properties;
                         foreach (PropertyData propertyData in properties)
                         {
-                            var propertyNode = new Node();
-                            propertyNode.Data = propertyData.ToString();
-                            typeNode.Nodes.Add(propertyNode);
+                            var propertyNodeData = new Node();
+                            propertyNodeData.Data = propertyData.ToString();
+                            typeNode.Nodes[2].Nodes.Add(propertyNodeData);
                         }
-                        nameSpaceNode.Nodes.Add(typeNode);
+                        nameSpaceNodeData.Nodes.Add(typeNode);
                     }
-                    Nodes.Add(nameSpaceNode);
+                    node.Nodes.Add(nameSpaceNode);
                 }
             }
             _treeView.ItemsSource = Nodes;
